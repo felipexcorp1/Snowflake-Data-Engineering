@@ -41,4 +41,38 @@ $$
 SHOW PROCEDURES LIKE '%DELETE_OLD%';
 DESCRIBE PROCEDURE DELETE_OLD();
 
-CALL DELETE_OLD();
+--CALL DELETE_OLD();
+
+CREATE DATABASE tasty_bytes_clone CLONE tasty_bytes;
+
+CREATE OR REPLACE PROCEDURE increase_prices()
+RETURNS BOOLEAN
+LANGUAGE SQL
+AS
+$$
+BEGIN
+    UPDATE tasty_bytes_clone.raw_pos.menu
+      SET SALE_PRICE_USD = menu.SALE_PRICE_USD + 1;
+END;
+$$;
+
+DESCRIBE PROCEDURE increase_prices();
+
+CALL increase_prices();
+
+
+
+CREATE OR REPLACE PROCEDURE decrease_mango_sticky_rice_price()
+RETURNS BOOLEAN
+LANGUAGE SQL
+AS
+$$
+BEGIN
+    UPDATE tasty_bytes_clone.raw_pos.menu
+      SET SALE_PRICE_USD = menu.SALE_PRICE_USD - 1
+      WHERE MENU_ITEM_NAME = 'Mango Sticky Rice';
+END;
+$$;
+
+DESCRIBE PROCEDURE decrease_mango_sticky_rice_price();
+SHOW PROCEDURES LIKE '%decrease_mango_sticky_rice_price%';
