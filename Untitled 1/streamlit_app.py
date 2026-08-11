@@ -57,16 +57,16 @@ def get_city_sales_chart(sales_data: pd.DataFrame):
             alt.Chart(sales_data)
             .mark_line(point=False, tooltip = True)
             .encode(
-                alt.x("DATE", title = "Date"),
-                alt.y("SUM_ORDERS", title = "Total sum orders"),
-                color = "PRIMARY_CITY"
+                alt.X("DATE", title = "Date"),
+                alt.Y("SUM_ORDERS", title = "Total sum orders"),
+                color = "PRIMARY_CITY",
             )
     )
     return chart
 
 def format_sql(sql):
     # Remove padded space for visual purposes
-    return sq.replace("\n         ", "\n")
+    return sql.replace("\n         ", "\n")
 
 first_col, second_col = st.columns(2, gap="large")
 
@@ -87,3 +87,12 @@ if len(selected_city) ==0:
     city_selection = ""
 else:
     city_selection = selected_city
+city_selection_list = ("'" + "','".join(city_selection) + "'" ) if city_selection else ""
+
+sales_data, sales_sql = get_city_sales_data(city_selection_list, start_year, end_year)
+sales_fig = get_city_sales_chart(sales_data)
+
+chart_tab, dataframe_tab, query_tab = st.tabs(["Chart", "Raw data", "Sql Query"])
+chart_tab.altair_chart(sales_fig, use_container_width=True)
+dataframe_tab.dataframe(sales_data,use_container_width=True)
+query_tab.code(format_sql(sales_sql), "sql")
