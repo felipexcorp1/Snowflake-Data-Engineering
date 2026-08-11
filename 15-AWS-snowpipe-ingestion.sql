@@ -1,0 +1,106 @@
+/*
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::amazon-snowlake-coursera"
+    },
+    {
+      "Sid": "ReadObjects",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::amazon-snowlake-coursera/*"
+    }
+  ]
+}
+
+*/
+
+CREATE OR REPLACE STORAGE INTEGRATION S3_ROLE_INTEGRATION
+    TYPE = EXTERNAL_STAGE
+    STORAGE_PROVIDER = S3
+    ENABLED = TRUE
+    STORAGE_AWS_ROLE_ARN = "arn:aws:iam::585335547179:role/snowflake_access_role"
+    STORAGE_ALLOWED_LOCATIONS =  ("S3://amazon-snowlake-coursera/");
+
+DESCRIBE INTEGRATION S3_ROLE_INTEGRATION;
+--STORAGE_AWS_IAM_USER_ARN = arn:aws:iam::377002868669:user/snc22000-s
+--STORAGE_AWS_EXTERNAL_ID =  EY01558_SFCRole=2_FDG3zkYoKvkRN9wlbxoSnqyN6Lc=
+CREATE OR REPLACE DATABASE S3_DB;
+CREATE OR REPLACE SCHEMA S3_DB.RAW;
+
+CREATE OR REPLACE TABLE S3_DB.RAW.ACME_SALES(
+order_id         VARCHAR,
+order_date       VARCHAR,
+customer_id      VARCHAR,
+product          VARCHAR,
+category         VARCHAR,
+quantity         VARCHAR,
+unit_price       VARCHAR,
+city             VARCHAR
+);
+
+CREATE OR REPLACE STAGE S3_DB.RAW.S3_STAGE
+URL=('S3://amazon-snowlake-coursera/')
+STORAGE_INTEGRATION = S3_ROLE_INTEGRATION;
+
+SHOW STAGES IN SCHEMA S3_DB.RAW;
+
+LIST @S3_DB.RAW.S3_STAGE;
+
+SELECT $1,$2,$3 from  @S3_DB.RAW.S3_STAGE;
+
+
+COPY INTO S3_DB.RAW.ACME_SALES
+FROM @S3_DB.RAW.S3_STAGE;
+
+SELECT * FROM S3_DB.RAW.ACME_SALES;
+
+
+CREATE OR REPLACE FILE FORMAT S3_DB.RAW.CSV_FILE_FORMAT
+    TYPE = CSV
+    SKIP_HEADER = 1
+    FIELD_OPTIONALLY_ENCLOSED_BY = '"'
+    TRIM_SPACE = TRUE;
+
+
+COPY INTO S3_DB.RAW.ACME_SALES
+FROM @S3_DB.RAW.S3_STAGE
+FILE_FORMAT = (
+    FORMAT_NAME = 'S3_DB.RAW.CSV_FILE_FORMAT'
+);
+
+TRUNCATE TABLE S3_DB.RAW.ACME_SALES;
+
+
+----------------
+
+
+USE WAREHOUSE COMPUTE_WH;
+
+CREATE PIPE S3_DB.RAW.S3_PIPE AUTO_INGEST = TRUE AS
+    COPY INTO S3_DB.RAW.ACME_SALES
+    FROM @S3_DB.RAW.S3_STAGE
+    FILE_FORMAT = (
+        FORMAT_NAME = 'S3_DB.RAW.CSV_FILE_FORMAT'
+    );
+
+SHOW PIPES;
+
+DESCRIBE PIPE S3_DB.RAW.S3_PIPE;
+
+CREATE OR REPLACE PIPE S3_DB.RAW.S3_PIPE_2 AUTO_INGEST = TRUE AS
+    COPY INTO S3_DB.RAW.ACME_SALES
+    FROM @S3_DB.RAW.S3_STAGE;
+
+LIST @S3_DB.RAW.S3_STAGE;
+
+SELECT * FROM S3_DB.RAW.ACME_SALES;

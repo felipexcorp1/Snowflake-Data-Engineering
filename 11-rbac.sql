@@ -13,3 +13,11 @@ USE ROLE TASTY_DE;
 CREATE WAREHOUSE TASTY_DE_TEST;
 
 GRANT CREATE WAREHOUSE ON ACCOUNT TO ROLE TASTY_DE;
+
+
+            SELECT 
+                distinct PRIMARY_CITY
+            FROM 
+                TASTY_BYTES.ANALYTICS.ORDERS_V
+            ORDER BY
+                PRIMARY_CITY
