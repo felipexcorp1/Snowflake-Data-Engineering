@@ -5,7 +5,7 @@ USE SCHEMA public;
 -- Create credentials
 CREATE OR REPLACE SECRET course_repo.public.github_pat
   TYPE = password
-  USERNAME = ''
+  USERNAME = 'felipexcorp1'
   PASSWORD = '';
 
 -- Create the API integration
@@ -22,4 +22,31 @@ CREATE OR REPLACE GIT REPOSITORY course_repo.public.advanced_data_engineering_sn
   GIT_CREDENTIALS = ;
 
 -- List the git repositories
+SHOW GIT REPOSITORIES;
+SHOW GIT REPOSITORIES;
+
+SELECT
+    repository_catalog AS DATABASE_NAME,
+    repository_schema  AS SCHEMA_NAME,
+    repository_name,
+    origin,
+    created,
+    last_altered,
+    owner
+FROM SNOWFLAKE.ACCOUNT_USAGE.GIT_REPOSITORIES
+ORDER BY
+    repository_catalog,
+    repository_schema,
+    repository_name;
+
+
+
+
+SHOW API INTEGRATIONS;
+
+DESCRIBE API INTEGRATION "github_snowflake_integration";
+
+
+SHOW STAGES IN ACCOUNT;
+
 SHOW GIT REPOSITORIES;
