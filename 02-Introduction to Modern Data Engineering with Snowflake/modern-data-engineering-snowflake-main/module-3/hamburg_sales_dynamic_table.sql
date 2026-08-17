@@ -4,9 +4,9 @@ USE DATABASE tasty_bytes;
 
 CREATE OR REPLACE DYNAMIC TABLE tasty_bytes.raw_pos.daily_sales_hamburg
 WAREHOUSE = 'COMPUTE_WH'
-TARGET_LAG =  
+TARGET_LAG =  '1 minute'
 AS
-SELECT
+SELECT 
     CAST(oh.ORDER_TS AS DATE) AS date,
     COALESCE(SUM(oh.ORDER_TOTAL), 0) AS total_sales
 FROM
@@ -16,8 +16,8 @@ JOIN
 ON
     oh.LOCATION_ID = loc.LOCATION_ID
 WHERE
-    loc.CITY = 'Hamburg'
-    AND loc.COUNTRY = 'Germany'
+    loc.CITY = 'Mumbai'
+    AND loc.COUNTRY = 'India'
 GROUP BY
     CAST(oh.ORDER_TS AS DATE);
 
@@ -60,4 +60,14 @@ INSERT INTO tasty_bytes.raw_pos.order_header (
     12.35                          -- ORDER_TOTAL
 );
 
-SELECT * FROM tasty_bytes.raw_pos.daily_sales_hamburg;
+SELECT * FROM tasty_bytes.raw_pos.daily_sales_hamburg WHERE date = '2024-03-09';
+
+
+SELECT 
+    *
+FROM
+    tasty_bytes.raw_pos.order_header 
+    WHERE ORDER_ID = 123456789
+    ;
+    
+SElect * from tasty_bytes.raw_pos.location where LOCATION_ID = 4493;
