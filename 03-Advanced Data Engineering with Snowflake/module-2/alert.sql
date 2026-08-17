@@ -9,7 +9,7 @@ CREATE TABLE staging_tasty_bytes.telemetry.data_quality_alerts (
   message VARCHAR,
   record_count INTEGER
 );
-
+--asd
 -- Create a serverless alert with a schedule:
 
   
