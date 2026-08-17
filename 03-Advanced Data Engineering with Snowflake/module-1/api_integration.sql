@@ -6,7 +6,7 @@ USE SCHEMA public;
 CREATE OR REPLACE SECRET course_repo.public.github_pat
   TYPE = password
   USERNAME = 'felipexcorp1'
-  PASSWORD = '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';
+  PASSWORD = 'toket created in github';
 
 -- Create the API integration
 CREATE OR REPLACE API INTEGRATION GIT_API_INTEGRATION_COURSE_3
